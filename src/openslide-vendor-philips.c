@@ -494,7 +494,7 @@ static bool fix_level_dimensions(struct level **levels,
                               "/text()");
   if (!result || result->nodesetval->nodeNr != level_count) {
     g_set_error(err, OPENSLIDE_ERROR, OPENSLIDE_ERROR_FAILED,
-                "Couldn't get level downsamples (nodeNR %"PRId32", level_count %"PRId32")", result->nodesetval->nodeNr, level_count);
+                "Couldn't get level downsamples (nodeNr %"PRId32", level_count %"PRId32")", result->nodesetval->nodeNr, level_count);
     goto DONE;
   }
 
