@@ -360,7 +360,7 @@ static bool maybe_add_xml_associated_image(openslide_t *osr,
     return false;
   }
 
-  //g_debug("Adding %s image from XML", name);
+  g_debug("Adding %s image from XML", name);
   struct xml_associated_image *img = g_slice_new0(struct xml_associated_image);
   img->base.ops = &philips_xml_associated_ops;
   img->base.w = w;
@@ -492,6 +492,7 @@ static bool fix_level_dimensions(struct level **levels,
                               "/DataObject[@ObjectType='PixelDataRepresentation']"
                               "/Attribute[@Name='DICOM_PIXEL_SPACING']"
                               "/text()");
+  printf("At check, nodeNr %"PRId32", level_count %"PRId32"\n", result->nodesetval->nodeNr, level_count); 
   if (!result || result->nodesetval->nodeNr != level_count) {
     g_set_error(err, OPENSLIDE_ERROR, OPENSLIDE_ERROR_FAILED,
                 "Couldn't get level downsamples (nodeNr %"PRId32", level_count %"PRId32")", result->nodesetval->nodeNr, level_count);
@@ -621,7 +622,7 @@ static bool philips_open(openslide_t *osr,
                                       (struct _openslide_level *) l, tiffl,
                                       err)) {
         g_slice_free(struct level, l);
-        goto FAIL;
+	    goto FAIL;
       }
       l->grid = _openslide_grid_create_simple(osr,
                                               tiffl->tiles_across,
@@ -632,6 +633,7 @@ static bool philips_open(openslide_t *osr,
 
       // add to array
       g_ptr_array_add(level_array, l);
+      printf("Adding level to array %d\n", dir);
 
       // verify that levels are sorted by size
       if (prev_l &&
@@ -646,7 +648,7 @@ static bool philips_open(openslide_t *osr,
     } else if (image_desc &&
                g_str_has_prefix(image_desc, LABEL_DESCRIPTION)) {
       // label
-      //g_debug("Adding label image from directory %d", dir);
+      printf("Adding label image from directory %d\n", dir);
       if (!_openslide_tiff_add_associated_image(osr, "label", tc, dir, err)) {
         goto FAIL;
       }
@@ -654,7 +656,7 @@ static bool philips_open(openslide_t *osr,
     } else if (image_desc &&
                g_str_has_prefix(image_desc, MACRO_DESCRIPTION)) {
       // macro image
-      //g_debug("Adding macro image from directory %d", dir);
+      printf("Adding macro image from directory %d\n", dir);
       if (!_openslide_tiff_add_associated_image(osr, "macro", tc, dir, err)) {
         goto FAIL;
       }
