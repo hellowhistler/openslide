@@ -345,12 +345,12 @@ static bool add_associated_image(openslide_t *osr,
     name = g_strdup(name_if_available);
   } else {
     char *val;
-    uint16_t resbit;
+    uint16_t subfile;
 
     // get name
     if (!TIFFGetField(tiff, TIFFTAG_IMAGEDESCRIPTION, &val)) {
-      TIFFGetField(tiff, TIFFTAG_SUBFILETYPE, &resbit);
-      switch (resbit) {
+      TIFFGetField(tiff, TIFFTAG_SUBFILETYPE, &subfile);
+      switch (subfile) {
       case 1:
         name = g_strdup("label");
         break;
