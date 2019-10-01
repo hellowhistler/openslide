@@ -345,29 +345,41 @@ static bool add_associated_image(openslide_t *osr,
     name = g_strdup(name_if_available);
   } else {
     char *val;
+    uint16_t resbit;
 
     // get name
     if (!TIFFGetField(tiff, TIFFTAG_IMAGEDESCRIPTION, &val)) {
-      return true;
-    }
-
-    // parse ImageDescription, after newline up to first whitespace -> gives name
-    char **lines = g_strsplit_set(val, "\r\n", -1);
-    if (!lines) {
-      return true;
-    }
-
-    if (lines[0] && lines[1]) {
-      char *line = lines[1];
-
-      char **names = g_strsplit(line, " ", -1);
-      if (names && names[0]) {
-	name = g_strdup(names[0]);
+      TIFFGetField(tiff, TIFFTAG_SUBFILETYPE, &resbit);
+      switch (resbit) {
+      case 1:
+        name = g_strdup("label");
+        break;
+      case 9:
+        name = g_strdup("macro");
+        break;
+      default:
+        return true; 
       }
-      g_strfreev(names);
-    }
+    } else {
 
-    g_strfreev(lines);
+      // parse ImageDescription, after newline up to first whitespace -> gives name
+      char **lines = g_strsplit_set(val, "\r\n", -1);
+      if (!lines) {
+	return true;
+      }
+
+      if (lines[0] && lines[1]) {
+	char *line = lines[1];
+
+	char **names = g_strsplit(line, " ", -1);
+	if (names && names[0]) {
+	  name = g_strdup(names[0]);
+	}
+	g_strfreev(names);
+      }
+
+      g_strfreev(lines);
+    }
   }
 
   if (!name) {
